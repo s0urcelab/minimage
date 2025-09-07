@@ -1,0 +1,35 @@
+# 忽略不需要的文件
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git
+.mypy_cache
+.pytest_cache
+.hypothesis
+
+# 忽略上传目录（避免将已上传的图片打包到镜像中）
+uploads/
+
+# 忽略文档和说明文件
+README.md
+*.md
+
+# 忽略Docker相关文件
+Dockerfile
+docker-compose.yml
+.dockerignore
