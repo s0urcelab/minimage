@@ -1,45 +1,36 @@
+[中文 (Chinese)](README.zh-CN.md)
+
 # minimage
 
-A minimalist image hosting service, API only.
-一个极简的图床，一切功能仅通过API。
+A minimalist image hosting service with API only.
 
-## 功能特性
+## Features
 
-- 🔐 带密码校验的图片上传（PNG, JPG, JPEG, GIF, BMP, WEBP）
-- 📁 本地文件存储（`/app/uploads` 目录）
-- 🖼️ 图片访问接口
-- 🐳 Docker容器化部署
-- 📊 健康检查
-- 🔒 文件类型和大小限制
-- ⏰ 自动清理：图片到期后自动删除（默认5分钟）
+- Password-protected image upload 
+- Local file storage (mounted at `/app/uploads`)
+- Optional auto-cleanup for expired files (configurable)
+- File type and size validation (PNG, JPG, JPEG, GIF, BMP, WEBP)
+- Dockerized, healthcheck
 
-## 快速开始
 
-### 使用Docker Compose（推荐）
+## Quick Start
 
-1. 克隆或下载项目文件
-2. 修改 `docker-compose.yml` 中的密码（可选）
-3. 运行服务：
+### Using Docker Compose (recommended)
+
+1) Clone this repo and optionally edit the password in `docker-compose.yml`
+
+2) Start service:
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
-服务将在 `http://localhost:5000` 启动
+Service will be available at `http://localhost:5000`.
 
-## API接口
+## API
 
-### 1. 上传图片
+### 1. Upload
 
-**POST** `/upload`
-
-**Headers：**
-- `X-Upload-Password`: 密码（必需）
-
-**参数：**
-- `file`: 图片文件（必需）
-
-**示例：**
 ```bash
 curl -X POST \
   -H "X-Upload-Password: admin123" \
@@ -47,11 +38,11 @@ curl -X POST \
   http://localhost:5000/upload
 ```
 
-**响应：**
+Response:
 ```json
 {
   "success": true,
-  "message": "上传成功",
+  "message": "uploaded",
   "filename": "20231201_143022_abc123.jpg",
   "url": "/image/20231201_143022_abc123.jpg",
   "size": 1024000,
@@ -59,41 +50,27 @@ curl -X POST \
 }
 ```
 
-### 2. 访问图片
+### 2. Get Image
 
-**GET** `/image/<filename>`
+GET `/image/<filename>`
 
-**示例：**
-```
-http://localhost:5000/image/20231201_143022_abc123.jpg
-```
+### 3. Healthcheck
 
-### 3. 健康检查
+GET `/health`
 
-**GET** `/health`
+### 4. Index
 
-**响应：**
-```json
-{
-  "status": "healthy",
-  "message": "图床服务运行正常"
-}
-```
+GET `/` returns basic metadata and config.
 
-### 4. API文档
+## Configuration
 
-**GET** `/`
+Environment variables:
+- `UPLOAD_PASSWORD`: upload password (default: `admin123`)
+- `MAX_FILE_SIZE_MB`: max upload size in MB (default: `10`)
+- `FILE_LIFETIME`: file expiration in seconds (default: `300`)
+- `CLEANUP_INTERVAL`: cleanup interval in seconds (default: `60`)
+- `AUTO_CLEANUP_ENABLED`: enable auto cleanup (`true/false`), default `false`
 
-返回完整的API使用说明
+## License
 
-## 配置说明
-
-### 环境变量
-
-- `UPLOAD_PASSWORD`: 上传密码，默认 `admin123`
-- `MAX_FILE_SIZE_MB`: 文件体积限制（MB），默认 `10`
-- `FILE_LIFETIME`: 文件过期时间（秒），默认 `300`
-- `CLEANUP_INTERVAL`: 清理检查间隔（秒），默认 `60`
-- `AUTO_CLEANUP_ENABLED`: 是否启用自动清理（`true/false`），默认 `false`
-
-
+[MIT](LICENSE)
