@@ -102,13 +102,9 @@ def start_cleanup_thread():
     logger.info(
         f"清理任务已启动，过期时间: {FILE_LIFETIME}s，检查间隔: {CLEANUP_INTERVAL}s")
 
-@app.before_first_request
-def _before_first_request():
-    """在首次请求时根据开关启动清理线程（适配 Gunicorn）。"""
-    if AUTO_CLEANUP_ENABLED:
-        ensure_cleanup_started_once()
-    else:
-        logger.info("自动清理功能已禁用（AUTO_CLEANUP_ENABLED=false）")
+# 在应用初始化后按需启动清理线程
+if AUTO_CLEANUP_ENABLED:
+    ensure_cleanup_started_once()
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -262,11 +258,5 @@ if __name__ == '__main__':
     logger.info(f"图床应用启动，端口: {port}")
     logger.info(f"上传密码: {UPLOAD_PASSWORD}")
     logger.info(f"上传目录: {UPLOAD_FOLDER}")
-
-    if AUTO_CLEANUP_ENABLED:
-        # 启动清理线程
-        logger.info(f"自动清理已开启")
-        logger.info(f"文件过期时间: {FILE_LIFETIME}s，清理间隔: {CLEANUP_INTERVAL}s")
-        ensure_cleanup_started_once()
     
     app.run(host='0.0.0.0', port=port, debug=False)
