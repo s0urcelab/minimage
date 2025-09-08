@@ -58,7 +58,7 @@ Response (200):
   "message": "upload complete",
   "data": {
     "filename": "a3d3c2c1-1a2b-3c4d-5e6f.jpg",
-    "url": "/image/a3d3c2c1-1a2b-3c4d-5e6f.jpg",
+    "url": "/i/a3d3c2c1-1a2b-3c4d-5e6f.jpg",
     "size": 1024000,
     "expires_in": 300
   }
@@ -67,7 +67,7 @@ Response (200):
 
 ### 2. Get Image
 
-GET `/image/<filename>`
+GET `/i/<filename>`
 
 - Returns the raw image.
 - 404 if not found or expired.

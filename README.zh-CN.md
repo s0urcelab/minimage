@@ -58,7 +58,7 @@ curl -X POST \
   "message": "上传成功",
   "data": {
     "filename": "a3d3c2c1-1a2b-3c4d-5e6f.jpg",
-    "url": "/image/a3d3c2c1-1a2b-3c4d-5e6f.jpg",
+    "url": "/i/a3d3c2c1-1a2b-3c4d-5e6f.jpg",
     "size": 1024000,
     "expires_in": 300
   }
@@ -67,7 +67,7 @@ curl -X POST \
 
 ### 2. 访问图片
 
-**GET** `/image/<filename>`
+**GET** `/i/<filename>`
 
 - 返回原始图片内容
 - 文件不存在或已过期将返回 404

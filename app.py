@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import os
-import hashlib
 import uuid
 import threading
 import time
-from datetime import datetime
 import sqlite3
 from flask import Flask, request, jsonify, send_file, abort, g
 from werkzeug.exceptions import HTTPException
@@ -252,9 +250,6 @@ def upload_file():
         # 写入数据库记录
         created_at = int(time.time())
         insert_image_record(new_filename, expires_in, created_at)
-
-        # 生成访问URL
-        file_url = f"/image/{new_filename}"
         
         logger.info(f"文件上传成功: {original_filename} -> {new_filename}")
         
@@ -263,7 +258,7 @@ def upload_file():
             'message': '上传成功',
             'data': {
                 'filename': new_filename,
-                'url': file_url,
+                'url': f"/i/{new_filename}",
                 'size': file_size,
                 'expires_in': expires_in
             }
@@ -276,7 +271,7 @@ def upload_file():
             'message': '上传出错'
         }), 500
 
-@app.route('/image/<filename>')
+@app.route('/i/<filename>')
 def get_image(filename):
     """
     获取图片接口
