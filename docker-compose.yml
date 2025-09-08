@@ -5,13 +5,15 @@ services:
     image: ghcr.io/s0urcelab/minimage:latest
     container_name: minimage
     ports:
-      - "5000:5000"
+      - "9527:9527"
     environment:
-      - UPLOAD_PASSWORD=admin123  # 修改为您想要的密码
-      - AUTO_CLEANUP_ENABLED=false # 是否开启自动清理（默认关闭）
+      - UPLOAD_AUTH_TOKEN=admin123 # 修改为您想要的鉴权值
       - MAX_FILE_SIZE_MB=10       # 文件体积限制（默认10MB）
-      - FILE_LIFETIME=300         # 文件过期秒数（默认300）
-      - CLEANUP_INTERVAL=60       # 清理检查间隔（默认60）
+      - FILE_LIFETIME=0           # 默认文件过期秒数（接口未指定时生效）
+      - CLEANUP_INTERVAL=600      # 清理检查间隔（默认600=10分钟）
+      - PUID=0                    # 设置UID
+      - PGID=0                    # 设置GID
+      - UMASK=022                 # 设置UMASK
     volumes:
       - ./uploads:/app/uploads  # 持久化存储上传的图片
     restart: unless-stopped

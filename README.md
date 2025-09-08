@@ -6,7 +6,7 @@ A minimalist image hosting service with API only.
 
 ## Features
 
-- Password-protected image upload 
+- Auth-protected image upload
 - Local file storage (mounted at `/app/uploads`)
 - Optional auto-cleanup for expired files (configurable)
 - File type and size validation (PNG, JPG, JPEG, GIF, BMP, WEBP)
@@ -17,15 +17,22 @@ A minimalist image hosting service with API only.
 
 ### Using Docker Compose (recommended)
 
-1) Clone this repo and optionally edit the password in `docker-compose.yml`
+1) Clone this repo and optionally edit the auth in `docker-compose.yml`
 
 2) Start service:
 
 ```bash
-docker compose up -d
+PUID=$(id -u) PGID=$(id -g) UMASK=022 docker compose up -d
+
+# or you can docker run
+docker run -d -p 9527:9527 \
+  -e PUID=$(id -u) \
+  -e PGID=$(id -g) \
+  -e UMASK=022 \
+  -v $(pwd)/uploads:/app/uploads ghcr.io/your-username/minimage:latest
 ```
 
-Service will be available at `http://localhost:5000`.
+Service will be available at `http://localhost:9527`.
 
 ## API
 
@@ -33,20 +40,28 @@ Service will be available at `http://localhost:5000`.
 
 ```bash
 curl -X POST \
-  -H "X-Upload-Password: admin123" \
+  -H "X-Upload-Auth: admin123" \
   -F "file=@image.jpg" \
-  http://localhost:5000/upload
+  -F "expires_in=300" \
+  http://localhost:9527/upload
 ```
 
-Response:
+Parameters:
+- Header `X-Upload-Auth` (required): must match `UPLOAD_AUTH_TOKEN`
+- Form `file` (required): the image file
+- Form or query `expires_in` (optional): seconds; `0` means never expire; default to `FILE_LIFETIME`
+
+Response (200):
 ```json
 {
   "success": true,
-  "message": "uploaded",
-  "filename": "20231201_143022_abc123.jpg",
-  "url": "/image/20231201_143022_abc123.jpg",
-  "size": 1024000,
-  "expires_in": 300
+  "message": "upload complete",
+  "data": {
+    "filename": "a3d3c2c1-1a2b-3c4d-5e6f.jpg",
+    "url": "/image/a3d3c2c1-1a2b-3c4d-5e6f.jpg",
+    "size": 1024000,
+    "expires_in": 300
+  }
 }
 ```
 
@@ -54,22 +69,48 @@ Response:
 
 GET `/image/<filename>`
 
-### 3. Healthcheck
+- Returns the raw image.
+- 404 if not found or expired.
 
-GET `/health`
+### 3. Delete
 
-### 4. Index
+```bash
+curl -X POST \
+  -H "X-Upload-Auth: admin123" \
+  -F "filename=a3d3c2c1-1a2b-3c4d-5e6f.jpg" \
+  http://localhost:9527/delete
+```
 
-GET `/` returns basic metadata and config.
+Response (200): `{ "success": true, "message": "delete complete" }`
+
+
+
+### 5. Index
+
+GET `/` returns service metadata and runtime config, for example:
+
+```json
+{
+  "name": "minimage",
+  "version": "latest",
+  "features": {
+    "default_file_lifetime_seconds": 300,
+    "cleanup_interval_seconds": 600,
+    "max_file_size_mb": 10
+  }
+}
+```
 
 ## Configuration
 
 Environment variables:
-- `UPLOAD_PASSWORD`: upload password (default: `admin123`)
+- `UPLOAD_AUTH_TOKEN`: upload auth token (default: `admin123`)
 - `MAX_FILE_SIZE_MB`: max upload size in MB (default: `10`)
-- `FILE_LIFETIME`: file expiration in seconds (default: `300`)
-- `CLEANUP_INTERVAL`: cleanup interval in seconds (default: `60`)
-- `AUTO_CLEANUP_ENABLED`: enable auto cleanup (`true/false`), default `false`
+- `FILE_LIFETIME`: default file expiration in seconds (default: `0`)
+- `CLEANUP_INTERVAL`: cleanup interval in seconds (default: `600`)
+- `PUID`: process user ID inside container for file ownership (default: `0`)
+- `PGID`: process group ID inside container for file ownership (default: `0`)
+- `UMASK`: file creation mask for uploads/logs (default: `022`)
 
 ## License
 
