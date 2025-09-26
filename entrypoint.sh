@@ -14,7 +14,7 @@ umask "${UMASK}"
 
 # 若未提供命令，则使用默认启动命令
 if [ $# -eq 0 ]; then
-    set -- gunicorn -k gevent -w 1 -b 0.0.0.0:9527 app:app
+    set -- gunicorn -c gunicorn.conf.py -k gevent -w 1 -b 0.0.0.0:9527 app:app
 fi
 
 # 如果第一个参数是以 '-' 开头（仅传入了参数），自动补全 gunicorn

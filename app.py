@@ -17,14 +17,14 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 
 # 配置
-UPLOAD_FOLDER = 'uploads'
+UPLOAD_FOLDER = 'data/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp'}
 MAX_FILE_SIZE_MB = int(os.getenv('MAX_FILE_SIZE_MB', '10')) # 最大文件大小
 MAX_FILE_SIZE = MAX_FILE_SIZE_MB * 1024 * 1024
 UPLOAD_AUTH_TOKEN = os.getenv('UPLOAD_AUTH_TOKEN', 'admin123') # 鉴权token
 FILE_LIFETIME = int(os.getenv('FILE_LIFETIME', 0))  # 默认过期时间，秒（默认永久有效）
 CLEANUP_INTERVAL = int(os.getenv('CLEANUP_INTERVAL', str(10 * 60)))  # 清理检查间隔，秒（默认10分钟）
-DB_PATH = os.getenv('DB_PATH', 'images.db')
+DB_PATH = os.getenv('DB_PATH', 'data/images.db')
 
 # 确保上传目录存在
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
